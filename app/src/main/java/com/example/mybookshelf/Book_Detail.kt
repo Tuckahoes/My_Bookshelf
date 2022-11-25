@@ -1,5 +1,6 @@
 package com.example.mybookshelf
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import org.w3c.dom.Text
+import java.io.File
 
 class Book_Detail : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,33 +51,51 @@ class Book_Detail : AppCompatActivity() {
             bookLink.text=bookDetail.getString("link","Unknown")
         }
 
-        //save按钮点击事件
-        val save=findViewById<TextView>(R.id.save)
-        save.setOnClickListener {
-            var theBookIndex=0
-            theBookIndex = if(bookIndex != 0) {
-                bookIndex
-            } else {
-                val bookSum=intent.getIntExtra("bookSum",0)
-                val menuEditor=getSharedPreferences("menu", Context.MODE_PRIVATE).edit()
-                menuEditor.putInt("sum",bookSum+1)//总数+1
-                menuEditor.apply()
-                bookSum+1
-            }
-            val bookEditor=getSharedPreferences(theBookIndex.toString(),Context.MODE_PRIVATE).edit()
-            bookEditor.putString("title", bookTitle.text.toString())
-            bookEditor.putString("author",bookAuthor.text.toString())
-            bookEditor.putString("time",bookPubDate.text.toString())
-            bookEditor.putString("publisher",bookPublisher.text.toString())
-            bookEditor.putString("ISBN",bookISBN.text.toString())
-            bookEditor.putString("condition",bookCondition.text.toString())
-            bookEditor.putString("position",bookPosition.text.toString())
-            bookEditor.putString("note",bookNote.text.toString())
-            bookEditor.putString("lable",bookLable.text.toString())
-            bookEditor.putString("link",bookLink.text.toString())
-            //bookEditor.putInt("imageId",bookImage.id)
-            bookEditor.apply()
-            Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
+        fun deleteFile(fileIndex:Int) {
+            val fileName=fileIndex.toString()
+            val file = File("/data/data/com.example.mybookshelf/shared_prefs/1.xml")
+            file.delete()
         }
+        //有BUG，姑且注释！！！！
+        //save按钮点击事件
+//        val save=findViewById<TextView>(R.id.save)
+//        save.setOnClickListener {
+//            var theBookIndex=0
+//            theBookIndex = if(bookIndex != 0) {
+//                val bookSum=intent.getIntExtra("bookSum",0)
+//                val menuEditor=getSharedPreferences("menu", Context.MODE_PRIVATE).edit()
+//                menuEditor.putInt("sum",bookSum-1)//总数+1
+//                menuEditor.apply()
+//                bookIndex
+//            } else {
+//                val bookSum=intent.getIntExtra("bookSum",0)
+//                val menuEditor=getSharedPreferences("menu", Context.MODE_PRIVATE).edit()
+//                menuEditor.putInt("sum",bookSum+1)//总数+1
+//                menuEditor.apply()
+//                bookSum+1
+//            }
+//
+//            val bookEditor=getSharedPreferences(theBookIndex.toString(),Context.MODE_PRIVATE).edit()
+//            bookEditor.putString("title", bookTitle.text.toString())
+//            bookEditor.putString("author",bookAuthor.text.toString())
+//            bookEditor.putString("time",bookPubDate.text.toString())
+//            bookEditor.putString("publisher",bookPublisher.text.toString())
+//            bookEditor.putString("ISBN",bookISBN.text.toString())
+//            bookEditor.putString("condition",bookCondition.text.toString())
+//            bookEditor.putString("position",bookPosition.text.toString())
+//            bookEditor.putString("note",bookNote.text.toString())
+//            bookEditor.putString("lable",bookLable.text.toString())
+//            bookEditor.putString("link",bookLink.text.toString())
+//            bookEditor.putInt("imageId",bookImage.id)
+//            bookEditor.putInt("index",theBookIndex)
+////            如果是添加书籍，一定要加上索引
+//            if(bookIndex == 0) {
+//                bookEditor.putInt("imageId",2131165395)
+//                bookEditor.putInt("index",theBookIndex)
+//            }
+//            bookEditor.apply()
+//            deleteFile(theBookIndex)
+//            Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
+//        }
     }
 }
