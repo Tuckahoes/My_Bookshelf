@@ -11,7 +11,8 @@ import android.widget.Toast
 import org.w3c.dom.Text
 import java.io.File
 
-class Book_Detail : AppCompatActivity() {
+class BookDetail : AppCompatActivity() {
+    @SuppressLint("Range")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_detail)
@@ -33,22 +34,28 @@ class Book_Detail : AppCompatActivity() {
         val bookCondition=findViewById<TextView>(R.id.bookCondition)
         val bookPosition=findViewById<TextView>(R.id.bookPosition)
         val bookNote=findViewById<TextView>(R.id.bookNote)
-        val bookLable=findViewById<TextView>(R.id.bookLable)
+        val bookLabel=findViewById<TextView>(R.id.bookLabel)
         val bookLink=findViewById<TextView>(R.id.bookLink)
         if(bookIndex != 0) {
+            //从数据库读取被点击的书本信息
+            val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
+            val db =dbHelper.writableDatabase
+            //where语句有问题
+            val cursor=db.query("Book",null,"id"+"=?",arrayOf("1"),null,null,null,null)
             //赋值
-            val bookDetail=getSharedPreferences(bookIndex.toString(),Context.MODE_PRIVATE)
-            bookImage.setImageResource(bookDetail.getInt("imageId",-2))
-            bookTitle.text=bookDetail.getString("title","Default Title")
-            bookAuthor.text=bookDetail.getString("author","Default Author")
-            bookPubDate.text=bookDetail.getString("time","0000-0")
-            bookPublisher.text=bookDetail.getString("publisher","Unknown")
-            bookISBN.text=bookDetail.getString("ISBN","00000000")
-            bookCondition.text=bookDetail.getString("condition","Unknown")
-            bookPosition.text=bookDetail.getString("position","Unknown")
-            bookNote.text=bookDetail.getString("note","none")
-            bookLable.text=bookDetail.getString("lable","Unset")
-            bookLink.text=bookDetail.getString("link","Unknown")
+            cursor.moveToFirst()
+            bookImage.setImageResource(cursor.getInt(cursor.getColumnIndex("imageId")))
+            bookTitle.text=cursor.getString(cursor.getColumnIndex("title"))
+            bookAuthor.text=cursor.getString(cursor.getColumnIndex("author"))
+            bookPubDate.text=cursor.getString(cursor.getColumnIndex("time"))
+            bookPublisher.text=cursor.getString(cursor.getColumnIndex("publisher"))
+            bookISBN.text=cursor.getString(cursor.getColumnIndex("ISBN"))
+            bookCondition.text=cursor.getString(cursor.getColumnIndex("condition"))
+            bookPosition.text=cursor.getString(cursor.getColumnIndex("position"))
+            bookNote.text=cursor.getString(cursor.getColumnIndex("note"))
+            bookLabel.text=cursor.getString(cursor.getColumnIndex("label"))
+            bookLink.text=cursor.getString(cursor.getColumnIndex("link"))
+            cursor.close()
         }
 
         fun deleteFile(fileIndex:Int) {

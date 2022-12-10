@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Book_Detail">
+    tools:context=".BookDetail">
 
     <!--    标题栏-->
     <LinearLayout
@@ -226,7 +226,7 @@
                 android:layout_height="45dp"
                 android:src="@drawable/ic_nav_lable"/>
             <EditText
-                android:id="@+id/bookLable"
+                android:id="@+id/bookLabel"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"/>
