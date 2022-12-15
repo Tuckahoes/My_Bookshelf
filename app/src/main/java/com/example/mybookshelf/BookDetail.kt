@@ -1,7 +1,9 @@
 package com.example.mybookshelf
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +26,7 @@ class BookDetail : AppCompatActivity() {
         }
         //接收书本index
         val bookIndex:Int=intent.getIntExtra("index",0)
+        //Toast.makeText(this,bookIndex.toString(),Toast.LENGTH_SHORT).show()
         //获取控件
         val bookImage=findViewById<ImageView>(R.id.bookImage)
         val bookTitle=findViewById<TextView>(R.id.bookTitle)
@@ -36,12 +39,13 @@ class BookDetail : AppCompatActivity() {
         val bookNote=findViewById<TextView>(R.id.bookNote)
         val bookLabel=findViewById<TextView>(R.id.bookLabel)
         val bookLink=findViewById<TextView>(R.id.bookLink)
+        //index!=0,展示选中的书本信息
+        val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
         if(bookIndex != 0) {
             //从数据库读取被点击的书本信息
-            val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
             val db =dbHelper.writableDatabase
-            //where语句有问题
-            val cursor=db.query("Book",null,"id"+"=?",arrayOf("1"),null,null,null,null)
+            val thisId=bookIndex.toString()
+            val cursor=db.query("Book",null,"id = ?",arrayOf(thisId),null,null,null,null)
             //赋值
             cursor.moveToFirst()
             bookImage.setImageResource(cursor.getInt(cursor.getColumnIndex("imageId")))
@@ -58,51 +62,66 @@ class BookDetail : AppCompatActivity() {
             cursor.close()
         }
 
-        fun deleteFile(fileIndex:Int) {
-            val fileName=fileIndex.toString()
-            val file = File("/data/data/com.example.mybookshelf/shared_prefs/1.xml")
-            file.delete()
-        }
-        //有BUG，姑且注释！！！！
         //save按钮点击事件
-//        val save=findViewById<TextView>(R.id.save)
-//        save.setOnClickListener {
-//            var theBookIndex=0
-//            theBookIndex = if(bookIndex != 0) {
-//                val bookSum=intent.getIntExtra("bookSum",0)
-//                val menuEditor=getSharedPreferences("menu", Context.MODE_PRIVATE).edit()
-//                menuEditor.putInt("sum",bookSum-1)//总数+1
-//                menuEditor.apply()
-//                bookIndex
-//            } else {
-//                val bookSum=intent.getIntExtra("bookSum",0)
-//                val menuEditor=getSharedPreferences("menu", Context.MODE_PRIVATE).edit()
-//                menuEditor.putInt("sum",bookSum+1)//总数+1
-//                menuEditor.apply()
-//                bookSum+1
-//            }
-//
-//            val bookEditor=getSharedPreferences(theBookIndex.toString(),Context.MODE_PRIVATE).edit()
-//            bookEditor.putString("title", bookTitle.text.toString())
-//            bookEditor.putString("author",bookAuthor.text.toString())
-//            bookEditor.putString("time",bookPubDate.text.toString())
-//            bookEditor.putString("publisher",bookPublisher.text.toString())
-//            bookEditor.putString("ISBN",bookISBN.text.toString())
-//            bookEditor.putString("condition",bookCondition.text.toString())
-//            bookEditor.putString("position",bookPosition.text.toString())
-//            bookEditor.putString("note",bookNote.text.toString())
-//            bookEditor.putString("lable",bookLable.text.toString())
-//            bookEditor.putString("link",bookLink.text.toString())
-//            bookEditor.putInt("imageId",bookImage.id)
-//            bookEditor.putInt("index",theBookIndex)
-////            如果是添加书籍，一定要加上索引
-//            if(bookIndex == 0) {
-//                bookEditor.putInt("imageId",2131165395)
-//                bookEditor.putInt("index",theBookIndex)
-//            }
-//            bookEditor.apply()
-//            deleteFile(theBookIndex)
-//            Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
-//        }
+        val save=findViewById<TextView>(R.id.save)
+        save.setOnClickListener {
+            val db=dbHelper.writableDatabase
+            if(bookIndex!=0) {
+                //index!=0,更新数据
+                //(救！直接更新不知道为何一直有bug，所以这里改成了删除新建的方法)
+                val updateMsg=ContentValues()
+                updateMsg.put("title",bookTitle.text.toString())
+                updateMsg.put("author",bookAuthor.text.toString())
+                updateMsg.put("time",bookPubDate.text.toString())
+                updateMsg.put("publisher",bookPublisher.text.toString())
+                updateMsg.put("ISBN",bookISBN.text.toString())
+                updateMsg.put("condition",bookCondition.text.toString())
+                updateMsg.put("position",bookPosition.text.toString())
+                updateMsg.put("note",bookNote.text.toString())
+                updateMsg.put("label",bookLabel.text.toString())
+                updateMsg.put("link",bookLink.text.toString())
+                updateMsg.put("imageId",bookImage.id)
+                val thisId=bookIndex.toString()
+                db.update("Book",updateMsg,"id = ?", arrayOf(thisId))
+//                db.delete("Book","id = ?", arrayOf(thisId))
+//                val addBook=ContentValues().apply {
+//                    //put("id",bookIndex)
+//                    put("title",bookTitle.text.toString())
+//                    put("imageId",bookImage.id)
+//                    put("author",bookAuthor.text.toString())
+//                    put("time",bookPubDate.text.toString())
+//                    put("publisher",bookPublisher.text.toString())
+//                    put("ISBN",bookISBN.text.toString())
+//                    put("condition",bookCondition.text.toString())
+//                    put("position",bookPosition.text.toString())
+//                    put("note",bookNote.text.toString())
+//                    put("label",bookLabel.text.toString())
+//                    put("link",bookLink.text.toString())
+//                }
+//                db.insert("Book",null,addBook)
+            }
+            else {
+                //index=0,新增书本
+                val addBook=ContentValues().apply {
+                    put("title",bookTitle.text.toString())
+                    put("imageId",R.drawable.defaultbook)
+                    put("author",bookAuthor.text.toString())
+                    put("time",bookPubDate.text.toString())
+                    put("publisher",bookPublisher.text.toString())
+                    put("ISBN",bookISBN.text.toString())
+                    put("condition",bookCondition.text.toString())
+                    put("position",bookPosition.text.toString())
+                    put("note",bookNote.text.toString())
+                    put("label",bookLabel.text.toString())
+                    put("link",bookLink.text.toString())
+                }
+                db.insert("Book",null,addBook)
+            }
+            Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
+            val intent = Intent()
+            intent.putExtra("dataReturn",1)
+            setResult(RESULT_OK,intent)
+            finish()
+        }
     }
 }

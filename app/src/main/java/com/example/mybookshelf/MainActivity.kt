@@ -3,6 +3,7 @@ package com.example.mybookshelf
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,6 +18,7 @@ import com.google.android.material.navigation.NavigationView
 class MainActivity : AppCompatActivity() {
 
     private val bookList=ArrayList<Book>()
+    //val adapter=BookAdapter(this,R.layout.books_meau,bookList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,20 +31,35 @@ class MainActivity : AppCompatActivity() {
             it.setHomeAsUpIndicator(R.drawable.ic_nav_menu)
         }
 
-        //初始化数据库内容
-        addBookstoSQLite()
+        val editor0=getSharedPreferences("times", Context.MODE_PRIVATE).edit()
+        editor0.putBoolean("init",true)
+        editor0.apply()
+        val prefs=getSharedPreferences("times",Context.MODE_PRIVATE)
+        val isFirstTime=prefs.getBoolean("isFirstTime",true)
+        //首次打开向数据库中添加一些书籍
+        if(isFirstTime) {
+            //初始化数据库内容
+            addBookstoSQLite()
+            val editor=getSharedPreferences("times", Context.MODE_PRIVATE).edit()
+            editor.putBoolean("isFirstTime",false)
+            editor.apply()
+        }
+
         //从数据表中读取数据并存入到bookList中
         initbookList()
 
+        //adapter.notifyDataSetChanged()
         val adapter=BookAdapter(this,R.layout.books_meau,bookList)
         val listView: ListView =findViewById(R.id.listView)
         listView.adapter=adapter
+        registerForContextMenu(listView)
         //主页面书本点击事件
         listView.setOnItemClickListener{parent,view,position,id->
             val intent = Intent(this,BookDetail::class.java)
             val clickedBook = bookList[position]
+            //Toast.makeText(this,(clickedBook.index).toString(),Toast.LENGTH_SHORT).show()
             intent.putExtra("index",clickedBook.index)
-            startActivity(intent)
+            startActivityForResult(intent,1)
         }
 
         //抽屉菜单点击事件
@@ -59,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             val intent =Intent(this,BookDetail::class.java)
             intent.putExtra("index",0)
-            startActivity(intent)
+            startActivityForResult(intent,2)
         }
 
     }
@@ -115,6 +132,44 @@ class MainActivity : AppCompatActivity() {
             }while(cursor.moveToNext())
         }
         cursor.close()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            1 -> if(resultCode== RESULT_OK) {
+                val returnedData=data?.getIntExtra("dataReturn",0)
+                if (returnedData==1) {
+                    bookList.clear()
+                    initbookList()
+                    //adapter.notifyDataSetChanged()
+                    val adapter=BookAdapter(this,R.layout.books_meau,bookList)
+                    val listView: ListView =findViewById(R.id.listView)
+                    listView.adapter=adapter
+                }
+
+            }
+        }
+    }
+
+    //ContextMenu长按开启上下文菜单，实现删除功能
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        v: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        menuInflater.inflate(R.menu.context_menu,menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.delete-> {
+                Toast.makeText(this,"删除成功",Toast.LENGTH_LONG).show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     //加载抽屉菜单栏布局文件
