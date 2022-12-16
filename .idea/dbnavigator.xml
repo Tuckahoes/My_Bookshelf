@@ -12,20 +12,18 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="0ac329c2-ff88-4fee-a4e4-b886b9a0ef83">
-      <console name="Connection 4" type="STANDARD" schema="" session="Main" />
+    <connection id="cd0e4c79-126d-4444-9441-c5b3bdd40bc2">
+      <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="0ac329c2-ff88-4fee-a4e4-b886b9a0ef83" object-ref="schemas/main/tables/Book" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="0ac329c2-ff88-4fee-a4e4-b886b9a0ef83" dataset="main.Book" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="cd0e4c79-126d-4444-9441-c5b3bdd40bc2" dataset="main.Book" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -44,9 +42,9 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="0ac329c2-ff88-4fee-a4e4-b886b9a0ef83" active="true" signed="true">
+      <connection id="cd0e4c79-126d-4444-9441-c5b3bdd40bc2" active="true" signed="true">
         <database>
-          <name value="Connection 4" />
+          <name value="Connection" />
           <description value="" />
           <database-type value="SQLITE" />
           <config-type value="BASIC" />
@@ -59,7 +57,7 @@
           <port value="" />
           <database value="" />
           <files>
-            <file path="D:\my_temp\dbfloder\BookStore1.db" schema="main" />
+            <file path="D:\my_temp\dbfloder\BookStore2.db" schema="main" />
           </files>
           <type value="NONE" />
           <user value="" />

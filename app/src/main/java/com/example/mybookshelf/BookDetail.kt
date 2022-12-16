@@ -45,7 +45,7 @@ class BookDetail : AppCompatActivity() {
             //从数据库读取被点击的书本信息
             val db =dbHelper.writableDatabase
             val thisId=bookIndex.toString()
-            val cursor=db.query("Book",null,"id = ?",arrayOf(thisId),null,null,null,null)
+            val cursor=db.query("Book",null,"_id = ?",arrayOf(thisId),null,null,null,null)
             //赋值
             cursor.moveToFirst()
             bookImage.setImageResource(cursor.getInt(cursor.getColumnIndex("imageId")))
@@ -80,25 +80,9 @@ class BookDetail : AppCompatActivity() {
                 updateMsg.put("note",bookNote.text.toString())
                 updateMsg.put("label",bookLabel.text.toString())
                 updateMsg.put("link",bookLink.text.toString())
-                updateMsg.put("imageId",bookImage.id)
+                //updateMsg.put("imageId",bookImage.id)
                 val thisId=bookIndex.toString()
-                db.update("Book",updateMsg,"id = ?", arrayOf(thisId))
-//                db.delete("Book","id = ?", arrayOf(thisId))
-//                val addBook=ContentValues().apply {
-//                    //put("id",bookIndex)
-//                    put("title",bookTitle.text.toString())
-//                    put("imageId",bookImage.id)
-//                    put("author",bookAuthor.text.toString())
-//                    put("time",bookPubDate.text.toString())
-//                    put("publisher",bookPublisher.text.toString())
-//                    put("ISBN",bookISBN.text.toString())
-//                    put("condition",bookCondition.text.toString())
-//                    put("position",bookPosition.text.toString())
-//                    put("note",bookNote.text.toString())
-//                    put("label",bookLabel.text.toString())
-//                    put("link",bookLink.text.toString())
-//                }
-//                db.insert("Book",null,addBook)
+                db.update("Book",updateMsg,"_id = ?", arrayOf(thisId))
             }
             else {
                 //index=0,新增书本
@@ -117,7 +101,7 @@ class BookDetail : AppCompatActivity() {
                 }
                 db.insert("Book",null,addBook)
             }
-            Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
             val intent = Intent()
             intent.putExtra("dataReturn",1)
             setResult(RESULT_OK,intent)

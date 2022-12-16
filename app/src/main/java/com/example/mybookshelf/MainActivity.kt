@@ -17,9 +17,6 @@ import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    private val bookList=ArrayList<Book>()
-    //val adapter=BookAdapter(this,R.layout.books_meau,bookList)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,20 +42,20 @@ class MainActivity : AppCompatActivity() {
             editor.apply()
         }
 
-        //从数据表中读取数据并存入到bookList中
-        initbookList()
-
-        //adapter.notifyDataSetChanged()
-        val adapter=BookAdapter(this,R.layout.books_meau,bookList)
+        //关联数据库与listView的适配器
+        val mSimpleCursorAdapter=SimpleCursorAdapter(
+            this,R.layout.books_meau,null,arrayOf("title","imageId","author","time"),
+            intArrayOf(R.id.book_title,R.id.book_image,R.id.book_author,R.id.book_time),
+            CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
         val listView: ListView =findViewById(R.id.listView)
-        listView.adapter=adapter
+        listView.adapter=mSimpleCursorAdapter
+        refreshListView()
+
         registerForContextMenu(listView)
         //主页面书本点击事件
         listView.setOnItemClickListener{parent,view,position,id->
             val intent = Intent(this,BookDetail::class.java)
-            val clickedBook = bookList[position]
-            //Toast.makeText(this,(clickedBook.index).toString(),Toast.LENGTH_SHORT).show()
-            intent.putExtra("index",clickedBook.index)
+            intent.putExtra("index",id.toInt())
             startActivityForResult(intent,1)
         }
 
@@ -78,8 +75,8 @@ class MainActivity : AppCompatActivity() {
             intent.putExtra("index",0)
             startActivityForResult(intent,2)
         }
-
     }
+
     //创建数据库Book表的“子表”BookStore,并加入一些信息
     private fun addBookstoSQLite() {
         val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
@@ -115,37 +112,26 @@ class MainActivity : AppCompatActivity() {
             db.insert("Book",null,bookMsg2)
         }
     }
-    //将数据库中数据读取到bookList中
-    @SuppressLint("Range")
-    private fun initbookList() {
+
+    //刷新数据列表
+    fun refreshListView(){
         val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
         val db=dbHelper.writableDatabase
         val cursor = db.query("Book",null,null,null,null,null,null)
-        if (cursor.moveToFirst()) {
-            do {
-                val index=cursor.getInt(cursor.getColumnIndex("id"))
-                val title=cursor.getString(cursor.getColumnIndex("title"))
-                val imageId=cursor.getInt(cursor.getColumnIndex("imageId"))
-                val author=cursor.getString(cursor.getColumnIndex("author"))
-                val time=cursor.getString(cursor.getColumnIndex("time"))
-                bookList.add(Book(title,imageId,author,time,index))
-            }while(cursor.moveToNext())
-        }
-        cursor.close()
+        val listView: ListView =findViewById(R.id.listView)
+        val mSimpleCursorAdapter:SimpleCursorAdapter = listView.adapter as SimpleCursorAdapter
+        mSimpleCursorAdapter.changeCursor(cursor)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             1 -> if(resultCode== RESULT_OK) {
+                //Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
                 val returnedData=data?.getIntExtra("dataReturn",0)
                 if (returnedData==1) {
-                    bookList.clear()
-                    initbookList()
-                    //adapter.notifyDataSetChanged()
-                    val adapter=BookAdapter(this,R.layout.books_meau,bookList)
-                    val listView: ListView =findViewById(R.id.listView)
-                    listView.adapter=adapter
+                    //Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
+                    refreshListView()
                 }
 
             }
@@ -161,11 +147,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreateContextMenu(menu, v, menuInfo)
         menuInflater.inflate(R.menu.context_menu,menu)
     }
-
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.delete-> {
-                Toast.makeText(this,"删除成功",Toast.LENGTH_LONG).show()
+                val menuInfo=item.menuInfo as AdapterView.AdapterContextMenuInfo
+                val theid=(menuInfo.position+1).toString()
+                val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
+                val db=dbHelper.writableDatabase
+                db.delete("Book","_id= ? ", arrayOf(theid))
+                Toast.makeText(this,"deleted successfully",Toast.LENGTH_SHORT).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -188,35 +178,3 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 }
-
-//书类,属性为书名、图片ID、书的信息（作者等）、出版时间
-class Book(var title:String, var imageId: Int,var author:String, var time:String,var index:Int )
-//适配器
-class BookAdapter(activity:Activity,val resourceId:Int ,data:List<Book>):
-        ArrayAdapter<Book>(activity,resourceId,data) {
-    inner class ViewHolder(val bookImage:ImageView,val bookTitle:TextView,val bookAuthor:TextView,val bookTime:TextView)
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val view:View
-                val viewHolder:ViewHolder
-                if(convertView==null){
-                    view = LayoutInflater.from(context).inflate(resourceId,parent,false)
-                    val bookImage:ImageView=view.findViewById(R.id.book_image)
-                    val bookTitle: TextView=view.findViewById(R.id.book_title)
-                    val bookAuthor:TextView=view.findViewById(R.id.book_author)
-                    val bookTime:TextView=view.findViewById(R.id.book_time)
-                    viewHolder=ViewHolder(bookImage,bookTitle,bookAuthor,bookTime)
-                    view.tag=viewHolder
-                }else{
-                    view = convertView
-                    viewHolder=view.tag as ViewHolder
-                }
-                val book = getItem(position)
-                if(book!=null) {
-                    viewHolder.bookImage.setImageResource(book.imageId)
-                    viewHolder.bookTitle.text=book.title
-                    viewHolder.bookAuthor.text=book.author
-                    viewHolder.bookTime.text=book.time
-                }
-            return view
-            }
-        }

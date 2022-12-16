@@ -8,7 +8,7 @@ import android.widget.Toast
 class MyDatabaseHelper(val context:Context,name:String,version:Int): SQLiteOpenHelper(context,name,null,version){
     //创建图书的数据库表
     private val createBook="create table Book ("+
-            "id integer primary key autoincrement,"+
+            "_id integer primary key autoincrement,"+
             "title text,"+
             "imageId integer,"+
             "author text,"+
