@@ -2,9 +2,11 @@ package com.example.mybookshelf
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.*
@@ -49,7 +51,10 @@ class MainActivity : AppCompatActivity() {
             CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
         val listView: ListView =findViewById(R.id.listView)
         listView.adapter=mSimpleCursorAdapter
-        refreshListView()
+        val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
+        val db=dbHelper.writableDatabase
+        var cursor = db.query("Book",null,null,null,null,null,null)
+        refreshListView(cursor)
 
         registerForContextMenu(listView)
         //主页面书本点击事件
@@ -64,7 +69,29 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout=findViewById<DrawerLayout>(R.id.drawerLayout)
         navView.setCheckedItem(R.id.nav_books)//设为默认选中
         navView.setNavigationItemSelectedListener {
-            //逻辑代码
+            when(it.itemId) {
+                R.id.nav_search -> {
+                    //Toast.makeText(this,"search",Toast.LENGTH_SHORT).show()
+                    val editorView=EditText(this)
+                    AlertDialog.Builder(this).apply{
+                        setTitle("Enter book title to query~")
+                        setCancelable(true)
+                        setView(editorView)
+                        setPositiveButton("query") { dialog,which ->
+                            val inputer=editorView.text.toString()
+                            if (inputer==""){Toast.makeText(context,"null value!",Toast.LENGTH_SHORT).show()}
+                            //Toast.makeText(context,inputer,Toast.LENGTH_SHORT).show()
+                            else {
+                                cursor = db.query("Book",null,"title LIKE ?",arrayOf("%"+inputer+"%"),null,null,null)
+                                refreshListView(cursor)
+                            }
+                        }
+                        setNegativeButton("Cancel") { dialog,which ->
+                        }
+                        show()
+                    }
+                }
+            }
             drawerLayout.closeDrawers()
             true
         }
@@ -114,10 +141,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //刷新数据列表
-    fun refreshListView(){
-        val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
-        val db=dbHelper.writableDatabase
-        val cursor = db.query("Book",null,null,null,null,null,null)
+    private fun refreshListView(cursor: Cursor){
         val listView: ListView =findViewById(R.id.listView)
         val mSimpleCursorAdapter:SimpleCursorAdapter = listView.adapter as SimpleCursorAdapter
         mSimpleCursorAdapter.changeCursor(cursor)
@@ -131,7 +155,10 @@ class MainActivity : AppCompatActivity() {
                 val returnedData=data?.getIntExtra("dataReturn",0)
                 if (returnedData==1) {
                     //Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
-                    refreshListView()
+                    val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
+                    val db=dbHelper.writableDatabase
+                    val cursor = db.query("Book",null,null,null,null,null,null)
+                    refreshListView(cursor)
                 }
 
             }
@@ -155,6 +182,8 @@ class MainActivity : AppCompatActivity() {
                 val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
                 val db=dbHelper.writableDatabase
                 db.delete("Book","_id= ? ", arrayOf(theid))
+                val cursor = db.query("Book",null,null,null,null,null,null)
+                refreshListView(cursor)
                 Toast.makeText(this,"deleted successfully",Toast.LENGTH_SHORT).show()
                 true
             }
@@ -174,6 +203,12 @@ class MainActivity : AppCompatActivity() {
             android.R.id.home -> drawerLayout.openDrawer(GravityCompat.START)
             R.id.settings -> Toast.makeText(this,"settings",Toast.LENGTH_SHORT).show()
             R.id.others -> Toast.makeText(this,"others",Toast.LENGTH_SHORT).show()
+            R.id.toAll -> {
+                val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
+                val db=dbHelper.writableDatabase
+                val cursor = db.query("Book",null,null,null,null,null,null)
+                refreshListView(cursor)
+            }
         }
         return true
     }

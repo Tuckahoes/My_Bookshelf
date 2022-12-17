@@ -68,7 +68,6 @@ class BookDetail : AppCompatActivity() {
             val db=dbHelper.writableDatabase
             if(bookIndex!=0) {
                 //index!=0,更新数据
-                //(救！直接更新不知道为何一直有bug，所以这里改成了删除新建的方法)
                 val updateMsg=ContentValues()
                 updateMsg.put("title",bookTitle.text.toString())
                 updateMsg.put("author",bookAuthor.text.toString())
