@@ -56,7 +56,7 @@
         <ImageView
             android:id="@+id/bookImage"
             android:layout_width="120dp"
-            android:layout_height="170dp"
+            android:layout_height="200dp"
             android:layout_margin="10dp"/>
 
         <!--书本各项信息-->
@@ -80,7 +80,7 @@
                 <EditText
                     android:id="@+id/bookTitle"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_weight="1"/>
             </LinearLayout><!--书名-->
             <LinearLayout
@@ -97,7 +97,7 @@
                 <EditText
                     android:id="@+id/bookAuthor"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_weight="1"/>
             </LinearLayout><!--作者-->
             <LinearLayout
@@ -114,7 +114,7 @@
                 <EditText
                     android:id="@+id/bookPublisher"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_weight="1"/>
             </LinearLayout><!--出版社-->
             <LinearLayout
@@ -131,7 +131,7 @@
                 <EditText
                     android:id="@+id/bookPubDate"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_weight="1"/>
             </LinearLayout><!--出版社时间-->
             <LinearLayout
@@ -148,7 +148,7 @@
                 <EditText
                     android:id="@+id/bookISBN"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:layout_weight="1"/>
             </LinearLayout><!--ISBN-->
 

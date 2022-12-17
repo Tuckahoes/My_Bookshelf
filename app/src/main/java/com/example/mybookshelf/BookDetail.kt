@@ -100,7 +100,7 @@ class BookDetail : AppCompatActivity() {
                 }
                 db.insert("Book",null,addBook)
             }
-            //Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,"data saved",Toast.LENGTH_SHORT).show()
             val intent = Intent()
             intent.putExtra("dataReturn",1)
             setResult(RESULT_OK,intent)

@@ -104,42 +104,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //创建数据库Book表的“子表”BookStore,并加入一些信息
-    private fun addBookstoSQLite() {
-        val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
-        val db =dbHelper.writableDatabase
-        val bookMsg=ContentValues().apply {
-            put("title","转生成为雷电将军然后天下无敌！")
-            put("imageId",R.drawable.book2)
-            put("author","Tuckahoe")
-            put("time","2002-1")
-            put("publisher","Tivato")
-            put("ISBN","22223333")
-            put("condition","Reading")
-            put("position","under the bed")
-            put("note","nothing")
-            put("label","unset")
-            put("link","unknown")
-        }
-        val bookMsg2=ContentValues().apply {
-            put("title","恋与Kokomi")
-            put("imageId",R.drawable.book1)
-            put("author","Tuckahoe")
-            put("time","2022-12")
-            put("publisher","Tivato")
-            put("ISBN","23333333")
-            put("condition","Reading")
-            put("position","table")
-            put("note","nothing")
-            put("label","unset")
-            put("link","unknown")
-        }
-        repeat(4) {
-            db.insert("Book",null,bookMsg)
-            db.insert("Book",null,bookMsg2)
-        }
-    }
-
     //刷新数据列表
     private fun refreshListView(cursor: Cursor){
         val listView: ListView =findViewById(R.id.listView)
@@ -147,6 +111,7 @@ class MainActivity : AppCompatActivity() {
         mSimpleCursorAdapter.changeCursor(cursor)
     }
 
+    //返回响应
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -160,7 +125,6 @@ class MainActivity : AppCompatActivity() {
                     val cursor = db.query("Book",null,null,null,null,null,null)
                     refreshListView(cursor)
                 }
-
             }
         }
     }
@@ -211,5 +175,67 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return true
+    }
+
+    //创建数据库Book表,并加入一些信息
+    private fun addBookstoSQLite() {
+        val dbHelper=MyDatabaseHelper(this,"BookStore.db",1)
+        val db =dbHelper.writableDatabase
+        val bookMsg=ContentValues().apply {
+            put("title","三国演义")
+            put("imageId",R.drawable.sanguo)
+            put("author","罗贯中")
+            put("time","元末明初洪武年间")
+            put("publisher","Unsure")
+            put("ISBN","66666666")
+            put("condition","Reading")
+            put("position","first shelf")
+            put("note","nothing")
+            put("label","unset")
+            put("link","unknown")
+        }
+        val bookMsg2=ContentValues().apply {
+            put("title","西游记")
+            put("imageId",R.drawable.xiyou)
+            put("author","吴承恩")
+            put("time","1522-1566")
+            put("publisher","Unsure")
+            put("ISBN","23333333")
+            put("condition","Reading")
+            put("position","table")
+            put("note","nothing")
+            put("label","unset")
+            put("link","unknown")
+        }
+        val bookMsg3=ContentValues().apply {
+            put("title","红楼梦")
+            put("imageId",R.drawable.honglou)
+            put("author","曹雪芹")
+            put("time","1784")
+            put("publisher","Unsure")
+            put("ISBN","88888888")
+            put("condition","Reading")
+            put("position","table")
+            put("note","nothing")
+            put("label","unset")
+            put("link","unknown")
+        }
+        val bookMsg4=ContentValues().apply {
+            put("title","水浒传")
+            put("imageId",R.drawable.shuihu)
+            put("author","施耐庵")
+            put("time","元末明初")
+            put("publisher","Unsure")
+            put("ISBN","555555555")
+            put("condition","Reading")
+            put("position","table")
+            put("note","nothing")
+            put("label","unset")
+            put("link","unknown")
+        }
+        db.insert("Book",null,bookMsg)
+        db.insert("Book",null,bookMsg2)
+        db.insert("Book",null,bookMsg3)
+        db.insert("Book",null,bookMsg4)
     }
 }
